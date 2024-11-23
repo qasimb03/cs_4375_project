@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import os
 
 #Dataset import
 url = 'https://raw.githubusercontent.com/qasimb03/cs_4375_project/refs/heads/main/austin_weather.csv'
@@ -209,7 +210,7 @@ def test_model(rnn, mean_squared_error):
     total_loss += loss
   return total_loss/len(X_test)
 
-def plot_losses_vs_epochs(loss_dict):
+def plot_losses_vs_epochs(loss_dict, combo_num):
     epochs = list(loss_dict.keys())
     training_losses = [loss_dict[epoch][0] for epoch in epochs]
     validation_losses = [loss_dict[epoch][1] for epoch in epochs]
@@ -224,7 +225,10 @@ def plot_losses_vs_epochs(loss_dict):
     plt.ylabel("Loss")
     plt.legend()
     plt.grid(True)
-    plt.show()
+    #plt.show()
+    os.makedirs('plots', exist_ok=True)
+    file_path = os.path.join("plots", str(combo_num))
+    plt.savefig(file_path)
 
 def singular_test_rnn():
     test_rnn = create_model(1e-3, 10) #0.001 LR, 10 hidden units, 100 epochs
@@ -242,22 +246,24 @@ def grid_search_parameter():
 
     best_hyperparameters = {}
     best_score = float('inf')
-
+    i = 0
     for lr in learning_rates:
         for hidden in hidden_units:
             for epochs in epochs_list:
+                i += 1
                 rnn = create_model(lr, hidden)
-                print(f"Training with learning_rate={lr}, hidden_units={hidden}, epochs={epochs}")
+                print("Combination ", i)
+                print(f"\tTraining with learning_rate={lr}, hidden_units={hidden}, epochs={epochs}")
                 epoch_loss_dictionary = train_model(rnn, epochs, mean_squared_error_func, mean_squared_error_derivative_func)
                 score = test_model(rnn, mean_squared_error_func)
-                print(f"Training Score (MSE) for this configuration: {epoch_loss_dictionary[list(epoch_loss_dictionary.keys())[-1]][0]}")
-                print(f"Validation Score (MSE) for this configuration: {epoch_loss_dictionary[list(epoch_loss_dictionary.keys())[-1]][1]}")
-                print(f"Test Score (MSE) for this configuration: {score}")
+                print(f"\tTraining Score (MSE) for this configuration: {epoch_loss_dictionary[list(epoch_loss_dictionary.keys())[-1]][0]}")
+                print(f"\tValidation Score (MSE) for this configuration: {epoch_loss_dictionary[list(epoch_loss_dictionary.keys())[-1]][1]}")
+                print(f"\tTest Score (MSE) for this configuration: {score}")
 
                 if score < best_score:
                     best_score = score
                     best_hyperparameters = {'learning_rate': lr, 'hidden_units': hidden, 'epochs': epochs}
-                plot_losses_vs_epochs(epoch_loss_dictionary)
+                plot_losses_vs_epochs(epoch_loss_dictionary, i)
                 print(f"Current best score: {best_score}")
 
     # Print the best hyperparameters
@@ -266,7 +272,7 @@ def grid_search_parameter():
 
 
 def main():
-    singular_test_rnn()
+    grid_search_parameter()
 
 if __name__ == '__main__':
    main()
