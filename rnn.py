@@ -110,7 +110,7 @@ class RNN:
     self.next_hidden = None
 
   def forward(self, inputs, hidden_state): #step by step
-    self.hidden_state = hidden_state
+    self.hidden_state = hidden_state 
     sequence_length = len(inputs)
     self.hiddens = np.zeros((sequence_length, self.hidden_size)) #7 time steps (each row holds hidden values for each time step)
     self.outputs = np.zeros(sequence_length) # 7 outputs, only last one matters for next day prediction
@@ -231,10 +231,10 @@ def plot_losses_vs_epochs(loss_dict, combo_num):
     plt.savefig(file_path)
 
 def singular_test_rnn():
-    test_rnn = create_model(1e-3, 10) #0.001 LR, 10 hidden units, 100 epochs
-    epoch_loss_dictionary = train_model(test_rnn, 10, mean_squared_error_func, mean_squared_error_derivative_func)
+    test_rnn = create_model(1e-3, 100) #0.001 LR, 10 hidden units, 100 epochs
+    epoch_loss_dictionary = train_model(test_rnn, 200, mean_squared_error_func, mean_squared_error_derivative_func)
     score = test_model(test_rnn, mean_squared_error_func)
-    plot_losses_vs_epochs(epoch_loss_dictionary)
+    plot_losses_vs_epochs(epoch_loss_dictionary, "singular")
     print("Testing Loss: ", score)
 
 
@@ -272,7 +272,8 @@ def grid_search_parameter():
 
 
 def main():
-    grid_search_parameter()
+    singular_test_rnn()
+    #grid_search_parameter()
 
 if __name__ == '__main__':
    main()
