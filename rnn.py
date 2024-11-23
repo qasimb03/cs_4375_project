@@ -109,7 +109,7 @@ class RNN:
     self.next_hidden = None
 
   def forward(self, inputs, hidden_state): #step by step
-
+    self.hidden_state = hidden_state
     sequence_length = len(inputs)
     self.hiddens = np.zeros((sequence_length, self.hidden_size)) #7 time steps (each row holds hidden values for each time step)
     self.outputs = np.zeros(sequence_length) # 7 outputs, only last one matters for next day prediction
